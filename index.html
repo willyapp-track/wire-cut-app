@@ -98,6 +98,12 @@
     <label for="end">End Time</label>
     <input type="time" id="end" />
 
+    <label for="totalRequired">Total Wires Required</label>
+    <input type="number" id="totalRequired" placeholder="e.g. 100" />
+
+    <label for="cutToday">Wires Cut Today</label>
+    <input type="number" id="cutToday" placeholder="e.g. 25" />
+
     <button onclick="saveCut()">Save Cut</button>
     <button onclick="endShift()">End Shift</button>
 
@@ -116,10 +122,12 @@
         type: document.getElementById('type').value,
         cutter: document.getElementById('cutter').value,
         start: document.getElementById('start').value,
-        end: document.getElementById('end').value
+        end: document.getElementById('end').value,
+        totalRequired: document.getElementById('totalRequired').value,
+        cutToday: document.getElementById('cutToday').value
       };
 
-      if (!cut.date || !cut.size || !cut.diameter || !cut.type || !cut.cutter || !cut.start || !cut.end) {
+      if (!cut.date || !cut.size || !cut.diameter || !cut.type || !cut.cutter || !cut.start || !cut.end || !cut.totalRequired || !cut.cutToday) {
         alert('Please fill in all fields');
         return;
       }
