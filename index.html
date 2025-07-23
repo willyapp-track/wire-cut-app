@@ -186,10 +186,11 @@
     }
   </script>
 <script type="module">
-  // Importa Firebase desde la web
+  // IMPORTS
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+  import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
 
-  // Tu configuración personalizada de Firebase
+  // CONFIGURACIÓN FIREBASE
   const firebaseConfig = {
     apiKey: "AIzaSyArL-sDIt0bQuHIDZIDpODjtV8bziQnEDo",
     authDomain: "wire-cut-app.firebaseapp.com",
@@ -199,35 +200,66 @@
     appId: "1:683731491281:web:38587d1f4de9c4640ce8f0"
   };
 
-  // Inicializa Firebase
   const app = initializeApp(firebaseConfig);
-</script>import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+  const auth = getAuth(app);
 
-const auth = getAuth(app);
+  // FUNCIÓN DE LOGIN
+  window.login = function () {
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
 
-window.login = function () {
-  const email = document.getElementById('email').value;
-  const password = document.getElementById('password').value;
+    signInWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
+        document.getElementById('login-container').style.display = 'none';
+        document.querySelector('.container').style.display = 'block';
+      })
+      .catch((error) => {
+        document.getElementById('login-error').innerText = "Login failed: " + error.message;
+      });
+  };
 
-  signInWithEmailAndPassword(auth, email, password)
-    .then((userCredential) => {
+  // CAMBIO DE ESTADO: mostrar u ocultar según login
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
       document.getElementById('login-container').style.display = 'none';
       document.querySelector('.container').style.display = 'block';
-    })
-    .catch((error) => {
-      document.getElementById('login-error').innerText = "Login failed: " + error.message;
-    });
-};
+    } else {
+      document.getElementById('login-container').style.display = 'block';
+      document.querySelector('.container').style.display = 'none';
+    }
+  });
 
-onAuthStateChanged(auth, (user) => {
-  if (user) {
-    document.getElementById('login-container').style.display = 'none';
-    document.querySelector('.container').style.display = 'block';
-  } else {
-    document.getElementById('login-container').style.display = 'block';
-    document.querySelector('.container').style.display = 'none';
-  }
-});
+  // GUARDAR WORKSHEET
+  window.saveWorkSheet = function () {
+    const sheet = {
+      coNumber: document.getElementById('coNumber').value,
+      operator: document.getElementById('operator').value,
+      shift: document.getElementById('shift').value,
+      cross: {
+        size: document.getElementById('crossSize').value,
+        diameter: document.getElementById('crossDiameter').value,
+        required: document.getElementById('crossRequired').value,
+        cut: document.getElementById('crossCut').value,
+        start: document.getElementById('crossStart').value,
+        end: document.getElementById('crossEnd').value,
+        machine: document.getElementById('crossMachine').value
+      },
+      long: {
+        size: document.getElementById('longSize').value,
+        diameter: document.getElementById('longDiameter').value,
+        required: document.getElementById('longRequired').value,
+        cut: document.getElementById('longCut').value,
+        start: document.getElementById('longStart').value,
+        end: document.getElementById('longEnd').value,
+        machine: document.getElementById('longMachine').value
+      },
+      notes: document.getElementById('notes').value
+    };
 
+    console.log("Work sheet saved:", sheet);
+    alert("Work sheet saved (in console for now)");
+  };
+</script>
 </body>
 </html>
+
