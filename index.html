@@ -68,77 +68,77 @@
 </head>
 <body>
   <div class="container">
-    <h1>Hoja de Trabajo</h1>
+    <h1>Work Sheet</h1>
 
     <label for="coNumber">CO-NUMBER</label>
     <input type="text" id="coNumber" placeholder="e.g. CO-1023" />
 
-    <label for="operator">Nombre del Operador</label>
-    <input type="text" id="operator" placeholder="Nombre completo" />
+    <label for="operator">Operator Name</label>
+    <input type="text" id="operator" placeholder="Full name" />
 
-    <label for="shift">Turno</label>
+    <label for="shift">Shift</label>
     <select id="shift">
-      <option value="Mañana">Mañana</option>
-      <option value="Tarde">Tarde</option>
-      <option value="Noche">Noche</option>
+      <option value="Morning">Morning</option>
+      <option value="Afternoon">Afternoon</option>
+      <option value="Night">Night</option>
     </select>
 
     <h3 style="color:#ccc;">Cross Wire</h3>
-    <label for="crossSize">Tamaño (in)</label>
+    <label for="crossSize">Size (in)</label>
     <input type="text" id="crossSize" placeholder="e.g. 2.5" />
 
-    <label for="crossDiameter">Diámetro (in)</label>
+    <label for="crossDiameter">Diameter (in)</label>
     <input type="text" id="crossDiameter" placeholder="e.g. 0.25" />
 
-    <label for="crossRequired">Cantidad Requerida</label>
+    <label for="crossRequired">Required Quantity</label>
     <input type="number" id="crossRequired" />
 
-    <label for="crossCut">Cantidad Cortada</label>
+    <label for="crossCut">Cut Quantity</label>
     <input type="number" id="crossCut" />
 
-    <label for="crossStart">Hora de Inicio</label>
+    <label for="crossStart">Start Time</label>
     <input type="time" id="crossStart" />
 
-    <label for="crossEnd">Hora de Fin</label>
+    <label for="crossEnd">End Time</label>
     <input type="time" id="crossEnd" />
 
-    <label for="crossMachine">Máquina</label>
+    <label for="crossMachine">Machine</label>
     <select id="crossMachine">
-      <option value="1">Máquina 1</option>
-      <option value="2">Máquina 2</option>
-      <option value="3">Máquina 3</option>
+      <option value="1">Machine 1</option>
+      <option value="2">Machine 2</option>
+      <option value="3">Machine 3</option>
     </select>
 
     <h3 style="color:#ccc;">Long Wire</h3>
-    <label for="longSize">Tamaño (in)</label>
+    <label for="longSize">Size (in)</label>
     <input type="text" id="longSize" placeholder="e.g. 4.0" />
 
-    <label for="longDiameter">Diámetro (in)</label>
+    <label for="longDiameter">Diameter (in)</label>
     <input type="text" id="longDiameter" placeholder="e.g. 0.25" />
 
-    <label for="longRequired">Cantidad Requerida</label>
+    <label for="longRequired">Required Quantity</label>
     <input type="number" id="longRequired" />
 
-    <label for="longCut">Cantidad Cortada</label>
+    <label for="longCut">Cut Quantity</label>
     <input type="number" id="longCut" />
 
-    <label for="longStart">Hora de Inicio</label>
+    <label for="longStart">Start Time</label>
     <input type="time" id="longStart" />
 
-    <label for="longEnd">Hora de Fin</label>
+    <label for="longEnd">End Time</label>
     <input type="time" id="longEnd" />
 
-    <label for="longMachine">Máquina</label>
+    <label for="longMachine">Machine</label>
     <select id="longMachine">
-      <option value="1">Máquina 1</option>
-      <option value="2">Máquina 2</option>
-      <option value="3">Máquina 3</option>
+      <option value="1">Machine 1</option>
+      <option value="2">Machine 2</option>
+      <option value="3">Machine 3</option>
     </select>
 
-    <label for="notes">Notas</label>
-    <textarea id="notes" rows="4" placeholder="Observaciones u otros detalles..."></textarea>
+    <label for="notes">Notes</label>
+    <textarea id="notes" rows="4" placeholder="Observations or other details..."></textarea>
 
-    <button onclick="saveWorkSheet()">Guardar Hoja de Trabajo</button>
+    <button onclick="saveWorkSheet()">Save Work Sheet</button>
 
     <div class="footer">© 2025 WireTrack Systems</div>
   </div>
@@ -170,8 +170,8 @@
         notes: document.getElementById('notes').value
       };
 
-      console.log("Hoja de trabajo registrada:", sheet);
-      alert("Hoja de trabajo guardada (en consola por ahora)");
+      console.log("Work sheet saved:", sheet);
+      alert("Work sheet saved (in console for now)");
     }
   </script>
 </body>
