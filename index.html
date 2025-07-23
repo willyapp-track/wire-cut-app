@@ -66,7 +66,18 @@
     }
   </style>
 </head>
-<body>
+<body><div id="login-container">
+  <h2>Login</h2>
+  <label for="email">Email</label>
+  <input type="email" id="email" placeholder="Enter your email" />
+
+  <label for="password">Password</label>
+  <input type="password" id="password" placeholder="Enter your password" />
+
+  <button onclick="login()">Login</button>
+  <p id="login-error" style="color: red;"></p>
+</div>
+
   <div class="container">
     <h1>Work Sheet</h1>
 
@@ -190,6 +201,33 @@
 
   // Inicializa Firebase
   const app = initializeApp(firebaseConfig);
-</script>
+</script>import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+
+const auth = getAuth(app);
+
+window.login = function () {
+  const email = document.getElementById('email').value;
+  const password = document.getElementById('password').value;
+
+  signInWithEmailAndPassword(auth, email, password)
+    .then((userCredential) => {
+      document.getElementById('login-container').style.display = 'none';
+      document.querySelector('.container').style.display = 'block';
+    })
+    .catch((error) => {
+      document.getElementById('login-error').innerText = "Login failed: " + error.message;
+    });
+};
+
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    document.getElementById('login-container').style.display = 'none';
+    document.querySelector('.container').style.display = 'block';
+  } else {
+    document.getElementById('login-container').style.display = 'block';
+    document.querySelector('.container').style.display = 'none';
+  }
+});
+
 </body>
 </html>
