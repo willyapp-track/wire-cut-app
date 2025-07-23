@@ -19,7 +19,7 @@
     }
     .container {
       width: 100%;
-      max-width: 480px;
+      max-width: 500px;
       background: rgba(43, 43, 43, 0.95);
       border: 1px solid #444;
       border-radius: 10px;
@@ -35,7 +35,7 @@
       margin: 0.5rem 0 0.2rem;
       color: #aaa;
     }
-    input, select {
+    input, select, textarea {
       width: 100%;
       padding: 0.5rem;
       margin-bottom: 0.5rem;
@@ -68,83 +68,110 @@
 </head>
 <body>
   <div class="container">
-    <h1>Wire Cut Log</h1>
+    <h1>Hoja de Trabajo</h1>
 
-    <label for="machine">Machine</label>
-    <select id="machine">
-      <option value="1">Machine 1</option>
-      <option value="2">Machine 2</option>
-      <option value="3">Machine 3</option>
+    <label for="coNumber">CO-NUMBER</label>
+    <input type="text" id="coNumber" placeholder="e.g. CO-1023" />
+
+    <label for="operator">Nombre del Operador</label>
+    <input type="text" id="operator" placeholder="Nombre completo" />
+
+    <label for="shift">Turno</label>
+    <select id="shift">
+      <option value="Mañana">Mañana</option>
+      <option value="Tarde">Tarde</option>
+      <option value="Noche">Noche</option>
     </select>
 
-    <label for="date">Date</label>
-    <input type="date" id="date" />
+    <h3 style="color:#ccc;">Cross Wire</h3>
+    <label for="crossSize">Tamaño (in)</label>
+    <input type="text" id="crossSize" placeholder="e.g. 2.5" />
 
-    <label for="size">Wire Size (in)</label>
-    <input type="text" id="size" placeholder="e.g. 2.5" />
+    <label for="crossDiameter">Diámetro (in)</label>
+    <input type="text" id="crossDiameter" placeholder="e.g. 0.25" />
 
-    <label for="diameter">Wire Diameter (in)</label>
-    <input type="text" id="diameter" placeholder="e.g. 0.25" />
+    <label for="crossRequired">Cantidad Requerida</label>
+    <input type="number" id="crossRequired" />
 
-    <label for="type">Wire Type</label>
-    <input type="text" id="type" placeholder="e.g. Steel" />
+    <label for="crossCut">Cantidad Cortada</label>
+    <input type="number" id="crossCut" />
 
-    <label for="cutter">Last Cutter Name</label>
-    <input type="text" id="cutter" placeholder="Enter operator name" />
+    <label for="crossStart">Hora de Inicio</label>
+    <input type="time" id="crossStart" />
 
-    <label for="start">Start Time</label>
-    <input type="time" id="start" />
+    <label for="crossEnd">Hora de Fin</label>
+    <input type="time" id="crossEnd" />
 
-    <label for="end">End Time</label>
-    <input type="time" id="end" />
+    <label for="crossMachine">Máquina</label>
+    <select id="crossMachine">
+      <option value="1">Máquina 1</option>
+      <option value="2">Máquina 2</option>
+      <option value="3">Máquina 3</option>
+    </select>
 
-    <label for="totalRequired">Total Wires Required</label>
-    <input type="number" id="totalRequired" placeholder="e.g. 100" />
+    <h3 style="color:#ccc;">Long Wire</h3>
+    <label for="longSize">Tamaño (in)</label>
+    <input type="text" id="longSize" placeholder="e.g. 4.0" />
 
-    <label for="cutToday">Wires Cut Today</label>
-    <input type="number" id="cutToday" placeholder="e.g. 25" />
+    <label for="longDiameter">Diámetro (in)</label>
+    <input type="text" id="longDiameter" placeholder="e.g. 0.25" />
 
-    <button onclick="saveCut()">Save Cut</button>
-    <button onclick="endShift()">End Shift</button>
+    <label for="longRequired">Cantidad Requerida</label>
+    <input type="number" id="longRequired" />
+
+    <label for="longCut">Cantidad Cortada</label>
+    <input type="number" id="longCut" />
+
+    <label for="longStart">Hora de Inicio</label>
+    <input type="time" id="longStart" />
+
+    <label for="longEnd">Hora de Fin</label>
+    <input type="time" id="longEnd" />
+
+    <label for="longMachine">Máquina</label>
+    <select id="longMachine">
+      <option value="1">Máquina 1</option>
+      <option value="2">Máquina 2</option>
+      <option value="3">Máquina 3</option>
+    </select>
+
+    <label for="notes">Notas</label>
+    <textarea id="notes" rows="4" placeholder="Observaciones u otros detalles..."></textarea>
+
+    <button onclick="saveWorkSheet()">Guardar Hoja de Trabajo</button>
 
     <div class="footer">© 2025 WireTrack Systems</div>
   </div>
 
   <script>
-    const cuts = [];
-
-    function saveCut() {
-      const cut = {
-        machine: document.getElementById('machine').value,
-        date: document.getElementById('date').value,
-        size: document.getElementById('size').value,
-        diameter: document.getElementById('diameter').value,
-        type: document.getElementById('type').value,
-        cutter: document.getElementById('cutter').value,
-        start: document.getElementById('start').value,
-        end: document.getElementById('end').value,
-        totalRequired: document.getElementById('totalRequired').value,
-        cutToday: document.getElementById('cutToday').value
+    function saveWorkSheet() {
+      const sheet = {
+        coNumber: document.getElementById('coNumber').value,
+        operator: document.getElementById('operator').value,
+        shift: document.getElementById('shift').value,
+        cross: {
+          size: document.getElementById('crossSize').value,
+          diameter: document.getElementById('crossDiameter').value,
+          required: document.getElementById('crossRequired').value,
+          cut: document.getElementById('crossCut').value,
+          start: document.getElementById('crossStart').value,
+          end: document.getElementById('crossEnd').value,
+          machine: document.getElementById('crossMachine').value
+        },
+        long: {
+          size: document.getElementById('longSize').value,
+          diameter: document.getElementById('longDiameter').value,
+          required: document.getElementById('longRequired').value,
+          cut: document.getElementById('longCut').value,
+          start: document.getElementById('longStart').value,
+          end: document.getElementById('longEnd').value,
+          machine: document.getElementById('longMachine').value
+        },
+        notes: document.getElementById('notes').value
       };
 
-      if (!cut.date || !cut.size || !cut.diameter || !cut.type || !cut.cutter || !cut.start || !cut.end || !cut.totalRequired || !cut.cutToday) {
-        alert('Please fill in all fields');
-        return;
-      }
-
-      cuts.push(cut);
-      alert('Cut saved');
-      document.querySelectorAll('input').forEach(input => input.value = '');
-    }
-
-    function endShift() {
-      if (cuts.length === 0) {
-        alert('No cuts to save');
-        return;
-      }
-      console.log('Shift cuts:', cuts);
-      alert('Shift ended and data saved. (In real app, this sends to database)');
-      cuts.length = 0;
+      console.log("Hoja de trabajo registrada:", sheet);
+      alert("Hoja de trabajo guardada (en consola por ahora)");
     }
   </script>
 </body>
