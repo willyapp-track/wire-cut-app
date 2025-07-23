@@ -25,6 +25,7 @@
       border-radius: 10px;
       padding: 1rem;
       box-shadow: 0 0 10px #111;
+      display: none;
     }
     h1 {
       text-align: center;
@@ -64,9 +65,13 @@
       text-align: center;
       color: #777;
     }
+    #logout {
+      background: #a00;
+    }
   </style>
 </head>
 <body>
+
 <div id="login-container">
   <h2>Login</h2>
   <label for="email">Email</label>
@@ -98,22 +103,16 @@
   <h3 style="color:#ccc;">Cross Wire</h3>
   <label for="crossSize">Size (in)</label>
   <input type="text" id="crossSize" placeholder="e.g. 2.5" />
-
   <label for="crossDiameter">Diameter (in)</label>
   <input type="text" id="crossDiameter" placeholder="e.g. 0.25" />
-
   <label for="crossRequired">Required Quantity</label>
   <input type="number" id="crossRequired" />
-
   <label for="crossCut">Cut Quantity</label>
   <input type="number" id="crossCut" />
-
   <label for="crossStart">Start Time</label>
   <input type="time" id="crossStart" />
-
   <label for="crossEnd">End Time</label>
   <input type="time" id="crossEnd" />
-
   <label for="crossMachine">Machine</label>
   <select id="crossMachine">
     <option value="1">Machine 1</option>
@@ -124,22 +123,16 @@
   <h3 style="color:#ccc;">Long Wire</h3>
   <label for="longSize">Size (in)</label>
   <input type="text" id="longSize" placeholder="e.g. 4.0" />
-
   <label for="longDiameter">Diameter (in)</label>
   <input type="text" id="longDiameter" placeholder="e.g. 0.25" />
-
   <label for="longRequired">Required Quantity</label>
   <input type="number" id="longRequired" />
-
   <label for="longCut">Cut Quantity</label>
   <input type="number" id="longCut" />
-
   <label for="longStart">Start Time</label>
   <input type="time" id="longStart" />
-
   <label for="longEnd">End Time</label>
   <input type="time" id="longEnd" />
-
   <label for="longMachine">Machine</label>
   <select id="longMachine">
     <option value="1">Machine 1</option>
@@ -151,13 +144,14 @@
   <textarea id="notes" rows="4" placeholder="Observations or other details..."></textarea>
 
   <button onclick="saveWorkSheet()">Save Work Sheet</button>
+  <button id="logout" onclick="logout()">Logout</button>
 
   <div class="footer">© 2025 WireTrack Systems</div>
 </div>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
-  import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+  import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
   import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
   const firebaseConfig = {
@@ -178,13 +172,20 @@
     const password = document.getElementById('password').value;
 
     signInWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
+      .then(() => {
         document.getElementById('login-container').style.display = 'none';
         document.querySelector('.container').style.display = 'block';
       })
       .catch((error) => {
         document.getElementById('login-error').innerText = "Login failed: " + error.message;
       });
+  };
+
+  window.logout = function () {
+    signOut(auth).then(() => {
+      document.getElementById('login-container').style.display = 'block';
+      document.querySelector('.container').style.display = 'none';
+    });
   };
 
   onAuthStateChanged(auth, (user) => {
@@ -221,17 +222,18 @@
         machine: document.getElementById('longMachine').value
       },
       notes: document.getElementById('notes').value,
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
+      user: auth.currentUser ? auth.currentUser.email : "unknown"
     };
 
     try {
       await addDoc(collection(db, "worksheets"), sheet);
       alert("✅ Work sheet saved successfully");
     } catch (e) {
-      console.error("Error saving document: ", e);
+      console.error("❌ Error saving:", e);
       alert("❌ Error saving work sheet");
     }
-  }
+  };
 </script>
 </body>
 </html>
