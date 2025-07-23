@@ -66,7 +66,8 @@
     }
   </style>
 </head>
-<body><div id="login-container">
+<body>
+<div id="login-container">
   <h2>Login</h2>
   <label for="email">Email</label>
   <input type="email" id="email" placeholder="Enter your email" />
@@ -78,119 +79,87 @@
   <p id="login-error" style="color: red;"></p>
 </div>
 
-  <div class="container">
-    <h1>Work Sheet</h1>
+<div class="container">
+  <h1>Work Sheet</h1>
 
-    <label for="coNumber">CO-NUMBER</label>
-    <input type="text" id="coNumber" placeholder="e.g. CO-1023" />
+  <label for="coNumber">CO-NUMBER</label>
+  <input type="text" id="coNumber" placeholder="e.g. CO-1023" />
 
-    <label for="operator">Operator Name</label>
-    <input type="text" id="operator" placeholder="Full name" />
+  <label for="operator">Operator Name</label>
+  <input type="text" id="operator" placeholder="Full name" />
 
-    <label for="shift">Shift</label>
-    <select id="shift">
-      <option value="Morning">Morning</option>
-      <option value="Afternoon">Afternoon</option>
-      <option value="Night">Night</option>
-    </select>
+  <label for="shift">Shift</label>
+  <select id="shift">
+    <option value="Morning">Morning</option>
+    <option value="Afternoon">Afternoon</option>
+    <option value="Night">Night</option>
+  </select>
 
-    <h3 style="color:#ccc;">Cross Wire</h3>
-    <label for="crossSize">Size (in)</label>
-    <input type="text" id="crossSize" placeholder="e.g. 2.5" />
+  <h3 style="color:#ccc;">Cross Wire</h3>
+  <label for="crossSize">Size (in)</label>
+  <input type="text" id="crossSize" placeholder="e.g. 2.5" />
 
-    <label for="crossDiameter">Diameter (in)</label>
-    <input type="text" id="crossDiameter" placeholder="e.g. 0.25" />
+  <label for="crossDiameter">Diameter (in)</label>
+  <input type="text" id="crossDiameter" placeholder="e.g. 0.25" />
 
-    <label for="crossRequired">Required Quantity</label>
-    <input type="number" id="crossRequired" />
+  <label for="crossRequired">Required Quantity</label>
+  <input type="number" id="crossRequired" />
 
-    <label for="crossCut">Cut Quantity</label>
-    <input type="number" id="crossCut" />
+  <label for="crossCut">Cut Quantity</label>
+  <input type="number" id="crossCut" />
 
-    <label for="crossStart">Start Time</label>
-    <input type="time" id="crossStart" />
+  <label for="crossStart">Start Time</label>
+  <input type="time" id="crossStart" />
 
-    <label for="crossEnd">End Time</label>
-    <input type="time" id="crossEnd" />
+  <label for="crossEnd">End Time</label>
+  <input type="time" id="crossEnd" />
 
-    <label for="crossMachine">Machine</label>
-    <select id="crossMachine">
-      <option value="1">Machine 1</option>
-      <option value="2">Machine 2</option>
-      <option value="3">Machine 3</option>
-    </select>
+  <label for="crossMachine">Machine</label>
+  <select id="crossMachine">
+    <option value="1">Machine 1</option>
+    <option value="2">Machine 2</option>
+    <option value="3">Machine 3</option>
+  </select>
 
-    <h3 style="color:#ccc;">Long Wire</h3>
-    <label for="longSize">Size (in)</label>
-    <input type="text" id="longSize" placeholder="e.g. 4.0" />
+  <h3 style="color:#ccc;">Long Wire</h3>
+  <label for="longSize">Size (in)</label>
+  <input type="text" id="longSize" placeholder="e.g. 4.0" />
 
-    <label for="longDiameter">Diameter (in)</label>
-    <input type="text" id="longDiameter" placeholder="e.g. 0.25" />
+  <label for="longDiameter">Diameter (in)</label>
+  <input type="text" id="longDiameter" placeholder="e.g. 0.25" />
 
-    <label for="longRequired">Required Quantity</label>
-    <input type="number" id="longRequired" />
+  <label for="longRequired">Required Quantity</label>
+  <input type="number" id="longRequired" />
 
-    <label for="longCut">Cut Quantity</label>
-    <input type="number" id="longCut" />
+  <label for="longCut">Cut Quantity</label>
+  <input type="number" id="longCut" />
 
-    <label for="longStart">Start Time</label>
-    <input type="time" id="longStart" />
+  <label for="longStart">Start Time</label>
+  <input type="time" id="longStart" />
 
-    <label for="longEnd">End Time</label>
-    <input type="time" id="longEnd" />
+  <label for="longEnd">End Time</label>
+  <input type="time" id="longEnd" />
 
-    <label for="longMachine">Machine</label>
-    <select id="longMachine">
-      <option value="1">Machine 1</option>
-      <option value="2">Machine 2</option>
-      <option value="3">Machine 3</option>
-    </select>
+  <label for="longMachine">Machine</label>
+  <select id="longMachine">
+    <option value="1">Machine 1</option>
+    <option value="2">Machine 2</option>
+    <option value="3">Machine 3</option>
+  </select>
 
-    <label for="notes">Notes</label>
-    <textarea id="notes" rows="4" placeholder="Observations or other details..."></textarea>
+  <label for="notes">Notes</label>
+  <textarea id="notes" rows="4" placeholder="Observations or other details..."></textarea>
 
-    <button onclick="saveWorkSheet()">Save Work Sheet</button>
+  <button onclick="saveWorkSheet()">Save Work Sheet</button>
 
-    <div class="footer">© 2025 WireTrack Systems</div>
-  </div>
+  <div class="footer">© 2025 WireTrack Systems</div>
+</div>
 
-  <script>
-    function saveWorkSheet() {
-      const sheet = {
-        coNumber: document.getElementById('coNumber').value,
-        operator: document.getElementById('operator').value,
-        shift: document.getElementById('shift').value,
-        cross: {
-          size: document.getElementById('crossSize').value,
-          diameter: document.getElementById('crossDiameter').value,
-          required: document.getElementById('crossRequired').value,
-          cut: document.getElementById('crossCut').value,
-          start: document.getElementById('crossStart').value,
-          end: document.getElementById('crossEnd').value,
-          machine: document.getElementById('crossMachine').value
-        },
-        long: {
-          size: document.getElementById('longSize').value,
-          diameter: document.getElementById('longDiameter').value,
-          required: document.getElementById('longRequired').value,
-          cut: document.getElementById('longCut').value,
-          start: document.getElementById('longStart').value,
-          end: document.getElementById('longEnd').value,
-          machine: document.getElementById('longMachine').value
-        },
-        notes: document.getElementById('notes').value
-      };
-
-      console.log("Work sheet saved:", sheet);
-      alert("Work sheet saved (in console for now)");
-    }
-  </script>
 <script type="module">
-  // IMPORTS
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
   import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+  import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
-  // CONFIGURACIÓN FIREBASE
   const firebaseConfig = {
     apiKey: "AIzaSyArL-sDIt0bQuHIDZIDpODjtV8bziQnEDo",
     authDomain: "wire-cut-app.firebaseapp.com",
@@ -202,8 +171,8 @@
 
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
+  const db = getFirestore(app);
 
-  // FUNCIÓN DE LOGIN
   window.login = function () {
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
@@ -218,7 +187,6 @@
       });
   };
 
-  // CAMBIO DE ESTADO: mostrar u ocultar según login
   onAuthStateChanged(auth, (user) => {
     if (user) {
       document.getElementById('login-container').style.display = 'none';
@@ -229,8 +197,7 @@
     }
   });
 
-  // GUARDAR WORKSHEET
-  window.saveWorkSheet = function () {
+  window.saveWorkSheet = async function () {
     const sheet = {
       coNumber: document.getElementById('coNumber').value,
       operator: document.getElementById('operator').value,
@@ -253,13 +220,18 @@
         end: document.getElementById('longEnd').value,
         machine: document.getElementById('longMachine').value
       },
-      notes: document.getElementById('notes').value
+      notes: document.getElementById('notes').value,
+      createdAt: new Date().toISOString()
     };
 
-    console.log("Work sheet saved:", sheet);
-    alert("Work sheet saved (in console for now)");
-  };
+    try {
+      await addDoc(collection(db, "worksheets"), sheet);
+      alert("✅ Work sheet saved successfully");
+    } catch (e) {
+      console.error("Error saving document: ", e);
+      alert("❌ Error saving work sheet");
+    }
+  }
 </script>
 </body>
 </html>
-
