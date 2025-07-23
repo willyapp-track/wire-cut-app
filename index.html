@@ -174,5 +174,22 @@
       alert("Work sheet saved (in console for now)");
     }
   </script>
+<script type="module">
+  // Importa Firebase desde la web
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+
+  // Tu configuración personalizada de Firebase
+  const firebaseConfig = {
+    apiKey: "AIzaSyArL-sDIt0bQuHIDZIDpODjtV8bziQnEDo",
+    authDomain: "wire-cut-app.firebaseapp.com",
+    projectId: "wire-cut-app",
+    storageBucket: "wire-cut-app.firebasestorage.app",
+    messagingSenderId: "683731491281",
+    appId: "1:683731491281:web:38587d1f4de9c4640ce8f0"
+  };
+
+  // Inicializa Firebase
+  const app = initializeApp(firebaseConfig);
+</script>
 </body>
 </html>
