@@ -153,7 +153,7 @@
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
   import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
-  import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+  import { getFirestore, collection, setDoc, doc, getDocs } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyArL-sDIt0bQuHIDZIDpODjtV8bziQnEDo",
@@ -199,8 +199,9 @@
   });
 
   window.saveWorkSheet = async function () {
+    const id = document.getElementById('coNumber').value;
     const sheet = {
-      coNumber: document.getElementById('coNumber').value,
+      coNumber: id,
       operator: document.getElementById('operator').value,
       shift: document.getElementById('shift').value,
       cross: {
@@ -227,7 +228,7 @@
     };
 
     try {
-      await addDoc(collection(db, "worksheets"), sheet);
+      await setDoc(doc(db, "worksheets", id), sheet);
       alert("✅ Work sheet saved successfully");
     } catch (e) {
       console.error("❌ Error saving:", e);
@@ -239,11 +240,38 @@
     try {
       const querySnapshot = await getDocs(collection(db, "worksheets"));
       let output = '📋 HISTORY:\n';
-      querySnapshot.forEach((doc) => {
-        const d = doc.data();
+      querySnapshot.forEach((docSnap) => {
+        const d = docSnap.data();
         output += `- ${d.coNumber} | ${d.operator} | ${d.createdAt}\n`;
       });
-      alert(output);
+      const coNumberToLoad = prompt(output + "\nEnter CO-NUMBER to load:");
+      if (coNumberToLoad) {
+        const docRef = doc(db, "worksheets", coNumberToLoad);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          const d = docSnap.data();
+          document.getElementById('coNumber').value = d.coNumber;
+          document.getElementById('operator').value = d.operator;
+          document.getElementById('shift').value = d.shift;
+          document.getElementById('crossSize').value = d.cross.size;
+          document.getElementById('crossDiameter').value = d.cross.diameter;
+          document.getElementById('crossRequired').value = d.cross.required;
+          document.getElementById('crossCut').value = d.cross.cut;
+          document.getElementById('crossStart').value = d.cross.start;
+          document.getElementById('crossEnd').value = d.cross.end;
+          document.getElementById('crossMachine').value = d.cross.machine;
+          document.getElementById('longSize').value = d.long.size;
+          document.getElementById('longDiameter').value = d.long.diameter;
+          document.getElementById('longRequired').value = d.long.required;
+          document.getElementById('longCut').value = d.long.cut;
+          document.getElementById('longStart').value = d.long.start;
+          document.getElementById('longEnd').value = d.long.end;
+          document.getElementById('longMachine').value = d.long.machine;
+          document.getElementById('notes').value = d.notes;
+        } else {
+          alert("❌ CO-NUMBER not found");
+        }
+      }
     } catch (error) {
       alert("Error loading history");
       console.error(error);
