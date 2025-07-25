@@ -65,6 +65,10 @@
       margin-bottom: 1rem;
       cursor: pointer;
     }
+    .worksheet-entry pre {
+      white-space: pre-wrap;
+      color: #ccc;
+    }
   </style>
   <script type="module">
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js';
@@ -119,7 +123,20 @@
         const data = docSnap.data();
         const entry = document.createElement('div');
         entry.classList.add('worksheet-entry');
-        entry.innerHTML = `<strong>CO#:</strong> ${data.coNumber}<br><strong>Date:</strong> ${new Date(data.createdAt).toLocaleDateString()}<br><pre>${JSON.stringify(data.days, null, 2)}</pre>`;
+        let content = `<strong>CO#:</strong> ${data.coNumber}<br><strong>Date:</strong> ${new Date(data.createdAt).toLocaleDateString()}<br>`;
+        for (const [day, values] of Object.entries(data.days)) {
+          content += `\n<strong>${capitalize(day)}:</strong>\n`;
+          content += `- Date: ${values.date || ''}\n`;
+          content += `- Operator: ${values.operator || ''}\n`;
+          content += `- Wire Type: ${values.wireType || ''}\n`;
+          content += `- Size: ${values.wireSize || ''} in\n`;
+          content += `- Diameter: ${values.wireDiameter || ''} in\n`;
+          content += `- Required: ${values.required || ''}\n`;
+          content += `- Cut: ${values.cut || ''}\n`;
+          content += `- Machine: ${values.machine || ''}\n`;
+          content += `- Notes: ${values.notes || ''}\n`;
+        }
+        entry.innerHTML = content.replace(/\n/g, '<br>');
         entry.addEventListener('click', () => loadWorksheet(data));
         historyContainer.appendChild(entry);
       });
