@@ -14,22 +14,16 @@
       margin: 0;
       padding: 1rem;
     }
-    h1, h2 {
+    h1, h2, h3 {
       text-align: center;
       color: #ccc;
     }
-    .day-container {
-      background-color: #2a2a2a;
-      border: 1px solid #444;
+    .auth-container, .day-container {
+      background: #2a2a2a;
       border-radius: 8px;
-      margin: 1rem 0;
       padding: 1rem;
-    }
-    .shift-container {
-      background-color: #333;
-      border-radius: 6px;
-      margin: 1rem 0;
-      padding: 1rem;
+      margin: 1rem auto;
+      max-width: 600px;
     }
     label {
       display: block;
@@ -56,154 +50,177 @@
     button:hover {
       background-color: #777;
     }
-    .button-group {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
+    .hidden {
+      display: none;
     }
   </style>
 </head>
 <body>
   <h1>Wire Cut Tracker</h1>
-  <div id="app"></div>
-  <script>
+
+  <div class="auth-container" id="login-box">
+    <h2>Login</h2>
+    <label for="email">Email</label>
+    <input type="email" id="email" placeholder="Email">
+    <label for="password">Password</label>
+    <input type="password" id="password" placeholder="Password">
+    <button onclick="login()">Login</button>
+    <p id="login-error" style="color: red;"></p>
+  </div>
+
+  <div id="app" class="hidden"></div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyArL-sDIt0bQuHIDZIDpODjtV8bziQnEDo",
+      authDomain: "wire-cut-app.firebaseapp.com",
+      projectId: "wire-cut-app",
+      storageBucket: "wire-cut-app.firebasestorage.app",
+      messagingSenderId: "683731491281",
+      appId: "1:683731491281:web:38587d1f4de9c4640ce8f0"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
     const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
     const shifts = ["Shift 1", "Shift 2"];
 
-    const app = document.getElementById('app');
+    const appDiv = document.getElementById("app");
 
-    days.forEach(day => {
-      const dayContainer = document.createElement('div');
-      dayContainer.className = 'day-container';
+    function renderTracker() {
+      appDiv.innerHTML = "";
+      days.forEach(day => {
+        const container = document.createElement("div");
+        container.className = "day-container";
+        const title = document.createElement("h2");
+        title.textContent = day;
+        container.appendChild(title);
 
-      const dayHeader = document.createElement('h2');
-      dayHeader.textContent = day;
-      dayContainer.appendChild(dayHeader);
+        shifts.forEach(shift => {
+          const subtitle = document.createElement("h3");
+          subtitle.textContent = shift;
+          container.appendChild(subtitle);
 
-      shifts.forEach(shift => {
-        const shiftContainer = document.createElement('div');
-        shiftContainer.className = 'shift-container';
+          const fields = [
+            { id: "operator", label: "Operator Name", type: "text" },
+            { id: "wireType", label: "Wire Type", type: "select", options: ["Cross Wire", "Long Wire"] },
+            { id: "wireSize", label: "Wire Size", type: "text" },
+            { id: "wireDiameter", label: "Wire Diameter", type: "text" },
+            { id: "requiredQty", label: "Required Quantity", type: "number" },
+            { id: "cutQty", label: "Cut Quantity", type: "number" },
+            { id: "machineNum", label: "Machine Number", type: "number" },
+            { id: "notes", label: "Notes", type: "textarea" }
+          ];
 
-        const shiftTitle = document.createElement('h3');
-        shiftTitle.textContent = shift;
-        shiftContainer.appendChild(shiftTitle);
+          const inputs = {};
 
-        const fields = [
-          { id: 'operator', label: 'Operator Name', type: 'text' },
-          { id: 'wireType', label: 'Wire Type', type: 'select', options: ['Cross Wire', 'Long Wire'] },
-          { id: 'wireSize', label: 'Wire Size', type: 'text' },
-          { id: 'wireDiameter', label: 'Wire Diameter', type: 'text' },
-          { id: 'requiredQty', label: 'Required Quantity', type: 'number' },
-          { id: 'cutQty', label: 'Cut Quantity', type: 'number' },
-          { id: 'machineNum', label: 'Machine Number', type: 'number' },
-          { id: 'notes', label: 'Notes', type: 'textarea' }
-        ];
+          fields.forEach(field => {
+            const label = document.createElement("label");
+            label.textContent = field.label;
+            const input = field.type === "select" ? document.createElement("select") :
+                           field.type === "textarea" ? document.createElement("textarea") :
+                           document.createElement("input");
 
-        const inputs = {};
-
-        fields.forEach(field => {
-          const label = document.createElement('label');
-          label.textContent = field.label;
-          shiftContainer.appendChild(label);
-
-          let input;
-          if (field.type === 'select') {
-            input = document.createElement('select');
-            field.options.forEach(opt => {
-              const option = document.createElement('option');
-              option.value = opt;
-              option.textContent = opt;
-              input.appendChild(option);
-            });
-          } else if (field.type === 'textarea') {
-            input = document.createElement('textarea');
-            input.rows = 3;
-          } else {
-            input = document.createElement('input');
-            input.type = field.type;
-          }
-          input.id = `${day}-${shift}-${field.id}`;
-          inputs[field.id] = input;
-          shiftContainer.appendChild(input);
-        });
-
-        const buttonGroup = document.createElement('div');
-        buttonGroup.className = 'button-group';
-
-        const saveBtn = document.createElement('button');
-        saveBtn.textContent = 'Save Work Sheet';
-        saveBtn.onclick = () => {
-          const data = {};
-          for (const key in inputs) {
-            data[key] = inputs[key].value;
-          }
-          localStorage.setItem(`${day}-${shift}-${Date.now()}`, JSON.stringify(data));
-          alert(`Saved ${day} - ${shift}`);
-        };
-        buttonGroup.appendChild(saveBtn);
-
-        const viewBtn = document.createElement('button');
-        viewBtn.textContent = 'View History';
-        viewBtn.onclick = () => {
-          const keys = Object.keys(localStorage).filter(k => k.startsWith(`${day}-${shift}`));
-          if (keys.length === 0) return alert("No saved records.");
-
-          const picker = document.createElement('select');
-          keys.forEach(k => {
-            const opt = document.createElement('option');
-            opt.value = k;
-            opt.textContent = new Date(Number(k.split('-').pop())).toLocaleString();
-            picker.appendChild(opt);
+            if (field.type === "select") {
+              field.options.forEach(opt => {
+                const option = document.createElement("option");
+                option.value = opt;
+                option.textContent = opt;
+                input.appendChild(option);
+              });
+            } else {
+              input.type = field.type;
+            }
+            input.id = `${day}-${shift}-${field.id}`;
+            inputs[field.id] = input;
+            container.appendChild(label);
+            container.appendChild(input);
           });
 
-          const loadBtn = document.createElement('button');
-          loadBtn.textContent = 'Open';
-          loadBtn.onclick = () => {
-            const data = JSON.parse(localStorage.getItem(picker.value));
-            for (const key in data) {
-              if (inputs[key]) inputs[key].value = data[key];
-            }
-            alert(`Loaded ${picker.value}`);
+          const saveBtn = document.createElement("button");
+          saveBtn.textContent = "Save Work Sheet";
+          saveBtn.onclick = async () => {
+            const user = auth.currentUser;
+            if (!user) return alert("Not logged in");
+            const sheet = {
+              operator: inputs.operator.value,
+              wireType: inputs.wireType.value,
+              wireSize: inputs.wireSize.value,
+              wireDiameter: inputs.wireDiameter.value,
+              requiredQty: inputs.requiredQty.value,
+              cutQty: inputs.cutQty.value,
+              machineNum: inputs.machineNum.value,
+              notes: inputs.notes.value,
+              user: user.email,
+              day,
+              shift,
+              timestamp: new Date().toISOString()
+            };
+            await setDoc(doc(db, "worksheets", `${day}-${shift}-${user.uid}`), sheet);
+            alert("Saved successfully!");
           };
+          container.appendChild(saveBtn);
 
-          const popup = document.createElement('div');
-          popup.appendChild(picker);
-          popup.appendChild(loadBtn);
-          shiftContainer.appendChild(popup);
-        };
-        buttonGroup.appendChild(viewBtn);
+          const viewBtn = document.createElement("button");
+          viewBtn.textContent = "View History";
+          viewBtn.onclick = async () => {
+            const user = auth.currentUser;
+            if (!user) return alert("Not logged in");
+            const ref = doc(db, "worksheets", `${day}-${shift}-${user.uid}`);
+            const snapshot = await getDoc(ref);
+            if (snapshot.exists()) {
+              const data = snapshot.data();
+              for (const key in inputs) {
+                if (data[key] !== undefined) {
+                  inputs[key].value = data[key];
+                }
+              }
+              alert("History loaded");
+            } else {
+              alert("No history found");
+            }
+          };
+          container.appendChild(viewBtn);
 
-        const deleteBtn = document.createElement('button');
-        deleteBtn.textContent = 'Delete All';
-        deleteBtn.onclick = () => {
-          const keys = Object.keys(localStorage).filter(k => k.startsWith(`${day}-${shift}`));
-          keys.forEach(k => localStorage.removeItem(k));
-          alert(`Deleted all records for ${day} - ${shift}`);
-        };
-        buttonGroup.appendChild(deleteBtn);
+          const logoutBtn = document.createElement("button");
+          logoutBtn.textContent = "Logout";
+          logoutBtn.onclick = () => signOut(auth);
+          container.appendChild(logoutBtn);
+        });
 
-        const pdfBtn = document.createElement('button');
-        pdfBtn.textContent = 'Generate PDF';
-        pdfBtn.onclick = () => {
-          const { jsPDF } = window.jspdf;
-          const doc = new jsPDF();
-          doc.setFontSize(12);
-          doc.text(`Work Sheet - ${day} - ${shift}`, 10, 10);
-          let y = 20;
-          for (const key in inputs) {
-            const val = inputs[key].value || '';
-            doc.text(`${key.replace(/([A-Z])/g, ' $1')}: ${val}`, 10, y);
-            y += 8;
-          }
-          doc.save(`${day}_${shift}_worksheet.pdf`);
-        };
-        buttonGroup.appendChild(pdfBtn);
-
-        shiftContainer.appendChild(buttonGroup);
-        dayContainer.appendChild(shiftContainer);
+        appDiv.appendChild(container);
       });
+    }
 
-      app.appendChild(dayContainer);
+    window.login = function () {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      signInWithEmailAndPassword(auth, email, password)
+        .then(() => {
+          document.getElementById("login-box").classList.add("hidden");
+          document.getElementById("app").classList.remove("hidden");
+          renderTracker();
+        })
+        .catch((error) => {
+          document.getElementById("login-error").innerText = error.message;
+        });
+    };
+
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        document.getElementById("login-box").classList.add("hidden");
+        document.getElementById("app").classList.remove("hidden");
+        renderTracker();
+      } else {
+        document.getElementById("login-box").classList.remove("hidden");
+        document.getElementById("app").classList.add("hidden");
+      }
     });
   </script>
 </body>
