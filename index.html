@@ -133,21 +133,52 @@
         const saveBtn = document.createElement('button');
         saveBtn.textContent = 'Save Work Sheet';
         saveBtn.onclick = () => {
-          alert(`Saving ${day} - ${shift} worksheet...`);
+          const data = {};
+          for (const key in inputs) {
+            data[key] = inputs[key].value;
+          }
+          localStorage.setItem(`${day}-${shift}-${Date.now()}`, JSON.stringify(data));
+          alert(`Saved ${day} - ${shift}`);
         };
         buttonGroup.appendChild(saveBtn);
 
         const viewBtn = document.createElement('button');
         viewBtn.textContent = 'View History';
         viewBtn.onclick = () => {
-          alert(`Viewing ${day} - ${shift} history...`);
+          const keys = Object.keys(localStorage).filter(k => k.startsWith(`${day}-${shift}`));
+          if (keys.length === 0) return alert("No saved records.");
+
+          const picker = document.createElement('select');
+          keys.forEach(k => {
+            const opt = document.createElement('option');
+            opt.value = k;
+            opt.textContent = new Date(Number(k.split('-').pop())).toLocaleString();
+            picker.appendChild(opt);
+          });
+
+          const loadBtn = document.createElement('button');
+          loadBtn.textContent = 'Open';
+          loadBtn.onclick = () => {
+            const data = JSON.parse(localStorage.getItem(picker.value));
+            for (const key in data) {
+              if (inputs[key]) inputs[key].value = data[key];
+            }
+            alert(`Loaded ${picker.value}`);
+          };
+
+          const popup = document.createElement('div');
+          popup.appendChild(picker);
+          popup.appendChild(loadBtn);
+          shiftContainer.appendChild(popup);
         };
         buttonGroup.appendChild(viewBtn);
 
         const deleteBtn = document.createElement('button');
-        deleteBtn.textContent = 'Delete Work Sheet';
+        deleteBtn.textContent = 'Delete All';
         deleteBtn.onclick = () => {
-          alert(`Deleting ${day} - ${shift} worksheet...`);
+          const keys = Object.keys(localStorage).filter(k => k.startsWith(`${day}-${shift}`));
+          keys.forEach(k => localStorage.removeItem(k));
+          alert(`Deleted all records for ${day} - ${shift}`);
         };
         buttonGroup.appendChild(deleteBtn);
 
