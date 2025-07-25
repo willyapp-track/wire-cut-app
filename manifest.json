@@ -1,18 +1,20 @@
 {
   "name": "Wire Cut Tracker",
   "short_name": "WireCut",
-  "start_url": "./",
+  "description": "App for tracking wire cut and production shifts",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#1c1c1c",
   "theme_color": "#1c1c1c",
+  "orientation": "portrait",
   "icons": [
     {
-      "src": "icon-192.png",
+      "src": "icons8-parcel-size-53.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "icon-512.png",
+      "src": "icons8-parcel-size-53.png",
       "sizes": "512x512",
       "type": "image/png"
     }
