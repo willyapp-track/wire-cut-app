@@ -4,46 +4,28 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Wire Cut Tracker</title>
-  <link rel="manifest" href="manifest.json">
-  <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('service-worker.js')
-          .then(reg => console.log('✅ Service Worker registered', reg))
-          .catch(err => console.error('❌ Service Worker error', err));
-      });
-    }
-  </script>
   <style>
     body {
       margin: 0;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: url('https://www.transparenttextures.com/patterns/brushed-alum.png');
       background-color: #1c1c1c;
-      background-repeat: repeat;
       color: #eee;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
       padding: 1rem;
     }
-    .container {
-      width: 100%;
-      max-width: 700px;
+    .day-section {
       background: rgba(43, 43, 43, 0.95);
       border: 1px solid #444;
       border-radius: 10px;
       padding: 1rem;
-      box-shadow: 0 0 10px #111;
-      display: none;
+      margin-bottom: 1.5rem;
     }
-    h1, h2 {
-      text-align: center;
+    h1, h2, h3 {
       color: #ccc;
+      margin-top: 0;
     }
     label {
       display: block;
-      margin: 0.5rem 0 0.2rem;
+      margin-top: 0.5rem;
       color: #aaa;
     }
     input, select, textarea {
@@ -63,246 +45,147 @@
       border: none;
       border-radius: 5px;
       font-weight: bold;
-      margin-top: 0.5rem;
+      margin-top: 1rem;
       transition: 0.2s;
     }
     button:hover {
       background: #666;
     }
     .footer {
-      margin-top: 1rem;
-      font-size: 0.8rem;
       text-align: center;
+      margin-top: 2rem;
+      font-size: 0.8rem;
       color: #777;
     }
-    #logout {
-      background: #a00;
-    }
-    #historyTable {
-      width: 100%;
-      margin-top: 1rem;
-      border-collapse: collapse;
-    }
-    #historyTable th, #historyTable td {
-      border: 1px solid #666;
+    .worksheet-entry {
+      background-color: #2a2a2a;
+      border: 1px solid #555;
+      border-radius: 8px;
       padding: 0.5rem;
-      text-align: center;
-    }
-    #historyTable th {
-      background: #333;
-      color: #eee;
-    }
-    #historyTable td button {
-      padding: 0.25rem 0.5rem;
-      font-size: 0.9rem;
+      margin-bottom: 1rem;
+      cursor: pointer;
     }
   </style>
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js';
+    import { getFirestore, collection, addDoc, getDocs } from 'https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js';
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyArL-sDIt0bQuHIDZIDpODjtV8bziQnEDo",
+      authDomain: "wire-cut-app.firebaseapp.com",
+      projectId: "wire-cut-app",
+      storageBucket: "wire-cut-app.appspot.com",
+      messagingSenderId: "683731491281",
+      appId: "1:683731491281:web:38587d1f4de9c4640ce8f0"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    window.saveWorkSheet = async function () {
+      const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
+      const weekData = {
+        coNumber: document.getElementById('coNumber').value,
+        createdAt: new Date().toISOString(),
+        days: {}
+      };
+      for (let day of days) {
+        weekData.days[day] = {
+          date: document.querySelector(`[name="${day}Date"]`).value,
+          operator: document.querySelector(`[name="${day}Operator"]`).value,
+          wireType: document.querySelector(`[name="${day}WireType"]`).value,
+          wireSize: document.querySelector(`[name="${day}WireSize"]`).value,
+          wireDiameter: document.querySelector(`[name="${day}WireDiameter"]`).value,
+          required: document.querySelector(`[name="${day}Required"]`).value,
+          cut: document.querySelector(`[name="${day}Cut"]`).value,
+          machine: document.querySelector(`[name="${day}Machine"]`).value,
+          notes: document.querySelector(`[name="${day}Notes"]`).value
+        };
+      }
+      try {
+        await addDoc(collection(db, 'weeklyWorksheets'), weekData);
+        alert('✅ Work sheet saved successfully');
+      } catch (e) {
+        console.error('❌ Error saving work sheet:', e);
+        alert('❌ Error saving work sheet');
+      }
+    };
+
+    window.viewHistory = async function () {
+      const historyContainer = document.getElementById('historyContainer');
+      historyContainer.innerHTML = '';
+      const querySnapshot = await getDocs(collection(db, 'weeklyWorksheets'));
+      querySnapshot.forEach((docSnap) => {
+        const data = docSnap.data();
+        const entry = document.createElement('div');
+        entry.classList.add('worksheet-entry');
+        entry.innerHTML = `<strong>CO#:</strong> ${data.coNumber}<br><strong>Date:</strong> ${new Date(data.createdAt).toLocaleDateString()}<br><pre>${JSON.stringify(data.days, null, 2)}</pre>`;
+        entry.addEventListener('click', () => loadWorksheet(data));
+        historyContainer.appendChild(entry);
+      });
+    };
+
+    function loadWorksheet(data) {
+      document.getElementById('coNumber').value = data.coNumber || '';
+      for (const [day, values] of Object.entries(data.days)) {
+        for (const key in values) {
+          const el = document.querySelector(`[name="${day}${capitalize(key)}"]`);
+          if (el) el.value = values[key];
+        }
+      }
+    }
+
+    function capitalize(str) {
+      return str.charAt(0).toUpperCase() + str.slice(1);
+    }
+  </script>
 </head>
 <body>
-<div id="login-container">
-  <h2>Login</h2>
-  <label for="email">Email</label>
-  <input type="email" id="email" placeholder="Enter your email" />
-  <label for="password">Password</label>
-  <input type="password" id="password" placeholder="Enter your password" />
-  <button onclick="login()">Login</button>
-  <p id="login-error" style="color: red;"></p>
-</div>
-
-<div class="container">
-  <h1>Work Sheet</h1>
+  <h1>Wire Cut Tracker</h1>
   <label for="coNumber">CO-NUMBER</label>
   <input type="text" id="coNumber" placeholder="e.g. CO-1023" />
-  <label for="operator">Operator Name</label>
-  <input type="text" id="operator" placeholder="Full name" />
-  <label for="shift">Shift</label>
-  <select id="shift">
-    <option value="Morning">Morning</option>
-    <option value="Afternoon">Afternoon</option>
-    <option value="Night">Night</option>
-  </select>
-  <h3 style="color:#ccc;">Cross Wire</h3>
-  <label for="crossSize">Size (in)</label>
-  <input type="text" id="crossSize" />
-  <label for="crossDiameter">Diameter (in)</label>
-  <input type="text" id="crossDiameter" />
-  <label for="crossRequired">Required Quantity</label>
-  <input type="number" id="crossRequired" />
-  <label for="crossCut">Cut Quantity</label>
-  <input type="number" id="crossCut" />
-  <label for="crossStart">Start Time</label>
-  <input type="time" id="crossStart" />
-  <label for="crossEnd">End Time</label>
-  <input type="time" id="crossEnd" />
-  <label for="crossMachine">Machine</label>
-  <select id="crossMachine">
-    <option value="1">Machine 1</option>
-    <option value="2">Machine 2</option>
-    <option value="3">Machine 3</option>
-  </select>
-  <h3 style="color:#ccc;">Long Wire</h3>
-  <label for="longSize">Size (in)</label>
-  <input type="text" id="longSize" />
-  <label for="longDiameter">Diameter (in)</label>
-  <input type="text" id="longDiameter" />
-  <label for="longRequired">Required Quantity</label>
-  <input type="number" id="longRequired" />
-  <label for="longCut">Cut Quantity</label>
-  <input type="number" id="longCut" />
-  <label for="longStart">Start Time</label>
-  <input type="time" id="longStart" />
-  <label for="longEnd">End Time</label>
-  <input type="time" id="longEnd" />
-  <label for="longMachine">Machine</label>
-  <select id="longMachine">
-    <option value="1">Machine 1</option>
-    <option value="2">Machine 2</option>
-    <option value="3">Machine 3</option>
-  </select>
-  <label for="notes">Notes</label>
-  <textarea id="notes" rows="4"></textarea>
+
+  <div id="week">
+    <script>
+      const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+      for (let day of days) {
+        document.write(`
+          <div class="day-section">
+            <h2>${day}</h2>
+            <label>Date</label>
+            <input type="date" name="${day.toLowerCase()}Date" />
+            <label>Operator Name</label>
+            <input type="text" name="${day.toLowerCase()}Operator" placeholder="Full name" />
+            <label>Wire Type</label>
+            <select name="${day.toLowerCase()}WireType">
+              <option value="Cross Wire">Cross Wire</option>
+              <option value="Long Wire">Long Wire</option>
+            </select>
+            <label>Wire Size (in)</label>
+            <input type="text" name="${day.toLowerCase()}WireSize" placeholder="e.g. 2.5" />
+            <label>Wire Diameter (in)</label>
+            <input type="text" name="${day.toLowerCase()}WireDiameter" placeholder="e.g. 0.25" />
+            <label>Required Quantity</label>
+            <input type="number" name="${day.toLowerCase()}Required" />
+            <label>Cut Quantity</label>
+            <input type="number" name="${day.toLowerCase()}Cut" />
+            <label>Machine</label>
+            <select name="${day.toLowerCase()}Machine">
+              <option value="1">Machine 1</option>
+              <option value="2">Machine 2</option>
+              <option value="3">Machine 3</option>
+            </select>
+            <label>Notes</label>
+            <textarea name="${day.toLowerCase()}Notes" rows="2" placeholder="Observations..."></textarea>
+          </div>
+        `);
+      }
+    </script>
+  </div>
+
   <button onclick="saveWorkSheet()">Save Work Sheet</button>
-  <button onclick="loadHistory()">View History</button>
-  <button id="logout" onclick="logout()">Logout</button>
-  <table id="historyTable"></table>
+  <button onclick="viewHistory()">View History</button>
+  <div id="historyContainer"></div>
   <div class="footer">© 2025 WireTrack Systems</div>
-</div>
-
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
-  import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
-  import { getFirestore, collection, setDoc, doc, getDocs, getDoc } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyArL-sDIt0bQuHIDZIDpODjtV8bziQnEDo",
-    authDomain: "wire-cut-app.firebaseapp.com",
-    projectId: "wire-cut-app",
-    storageBucket: "wire-cut-app.firebasestorage.app",
-    messagingSenderId: "683731491281",
-    appId: "1:683731491281:web:38587d1f4de9c4640ce8f0"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db = getFirestore(app);
-
-  window.login = function () {
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-    signInWithEmailAndPassword(auth, email, password)
-      .then(() => {
-        document.getElementById('login-container').style.display = 'none';
-        document.querySelector('.container').style.display = 'block';
-      })
-      .catch((error) => {
-        document.getElementById('login-error').innerText = "Login failed: " + error.message;
-      });
-  };
-
-  window.logout = function () {
-    signOut(auth).then(() => {
-      document.getElementById('login-container').style.display = 'block';
-      document.querySelector('.container').style.display = 'none';
-    });
-  };
-
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      document.getElementById('login-container').style.display = 'none';
-      document.querySelector('.container').style.display = 'block';
-    } else {
-      document.getElementById('login-container').style.display = 'block';
-      document.querySelector('.container').style.display = 'none';
-    }
-  });
-
-  window.saveWorkSheet = async function () {
-    const id = document.getElementById('coNumber').value;
-    const sheet = {
-      coNumber: id,
-      operator: document.getElementById('operator').value,
-      shift: document.getElementById('shift').value,
-      cross: {
-        size: document.getElementById('crossSize').value,
-        diameter: document.getElementById('crossDiameter').value,
-        required: document.getElementById('crossRequired').value,
-        cut: document.getElementById('crossCut').value,
-        start: document.getElementById('crossStart').value,
-        end: document.getElementById('crossEnd').value,
-        machine: document.getElementById('crossMachine').value
-      },
-      long: {
-        size: document.getElementById('longSize').value,
-        diameter: document.getElementById('longDiameter').value,
-        required: document.getElementById('longRequired').value,
-        cut: document.getElementById('longCut').value,
-        start: document.getElementById('longStart').value,
-        end: document.getElementById('longEnd').value,
-        machine: document.getElementById('longMachine').value
-      },
-      notes: document.getElementById('notes').value,
-      createdAt: new Date().toISOString(),
-      user: auth.currentUser ? auth.currentUser.email : "unknown"
-    };
-    try {
-      await setDoc(doc(db, "worksheets", id), sheet);
-      alert("✅ Work sheet saved successfully");
-    } catch (e) {
-      console.error("❌ Error saving:", e);
-      alert("❌ Error saving work sheet");
-    }
-  };
-
-  window.loadHistory = async function () {
-    const table = document.getElementById("historyTable");
-    table.innerHTML = "<tr><th>CO-NUMBER</th><th>Operator</th><th>Date</th><th>Action</th></tr>";
-    try {
-      const querySnapshot = await getDocs(collection(db, "worksheets"));
-      querySnapshot.forEach((docSnap) => {
-        const d = docSnap.data();
-        const row = table.insertRow(-1);
-        row.insertCell(0).innerText = d.coNumber;
-        row.insertCell(1).innerText = d.operator;
-        row.insertCell(2).innerText = new Date(d.createdAt).toLocaleString();
-        const btn = document.createElement("button");
-        btn.innerText = "Open";
-        btn.onclick = () => loadWorkSheet(d.coNumber);
-        const actionCell = row.insertCell(3);
-        actionCell.appendChild(btn);
-      });
-    } catch (error) {
-      alert("Error loading history");
-      console.error(error);
-    }
-  };
-
-  window.loadWorkSheet = async function (id) {
-    const docRef = doc(db, "worksheets", id);
-    const docSnap = await getDoc(docRef);
-    if (docSnap.exists()) {
-      const d = docSnap.data();
-      document.getElementById('coNumber').value = d.coNumber;
-      document.getElementById('operator').value = d.operator;
-      document.getElementById('shift').value = d.shift;
-      document.getElementById('crossSize').value = d.cross.size;
-      document.getElementById('crossDiameter').value = d.cross.diameter;
-      document.getElementById('crossRequired').value = d.cross.required;
-      document.getElementById('crossCut').value = d.cross.cut;
-      document.getElementById('crossStart').value = d.cross.start;
-      document.getElementById('crossEnd').value = d.cross.end;
-      document.getElementById('crossMachine').value = d.cross.machine;
-      document.getElementById('longSize').value = d.long.size;
-      document.getElementById('longDiameter').value = d.long.diameter;
-      document.getElementById('longRequired').value = d.long.required;
-      document.getElementById('longCut').value = d.long.cut;
-      document.getElementById('longStart').value = d.long.start;
-      document.getElementById('longEnd').value = d.long.end;
-      document.getElementById('longMachine').value = d.long.machine;
-      document.getElementById('notes').value = d.notes;
-    } else {
-      alert("❌ CO-NUMBER not found");
-    }
-  };
-</script>
 </body>
 </html>
