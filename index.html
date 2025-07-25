@@ -65,11 +65,27 @@
 <body>
   <h1>Wire Cut Tracker</h1>
   <div id="app"></div>
-  <script>
+
+  <!-- Firebase Config & Functions -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+    import { getFirestore, doc, setDoc, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyArL-sDIt0bQuHIDZIDpODjtV8bziQnEDo",
+      authDomain: "wire-cut-app.firebaseapp.com",
+      projectId: "wire-cut-app",
+      storageBucket: "wire-cut-app.appspot.com",
+      messagingSenderId: "683731491281",
+      appId: "1:683731491281:web:38587d1f4de9c4640ce8f0"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
     const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
     const shifts = ["Shift 1", "Shift 2"];
-
-    const app = document.getElementById('app');
+    const appDiv = document.getElementById('app');
 
     days.forEach(day => {
       const dayContainer = document.createElement('div');
@@ -128,31 +144,73 @@
 
         const saveBtn = document.createElement('button');
         saveBtn.textContent = 'Save Work Sheet';
-        saveBtn.onclick = () => {
-          alert(`Saving ${day} - ${shift} worksheet...`);
-        };
+        saveBtn.onclick = () => handleSave(day, shift);
         buttonGroup.appendChild(saveBtn);
 
         const viewBtn = document.createElement('button');
         viewBtn.textContent = 'View History';
-        viewBtn.onclick = () => {
-          alert(`Viewing ${day} - ${shift} history...`);
-        };
+        viewBtn.onclick = () => handleView(day, shift);
         buttonGroup.appendChild(viewBtn);
 
         const deleteBtn = document.createElement('button');
         deleteBtn.textContent = 'Delete Work Sheet';
-        deleteBtn.onclick = () => {
-          alert(`Deleting ${day} - ${shift} worksheet...`);
-        };
+        deleteBtn.onclick = () => handleDelete(day, shift);
         buttonGroup.appendChild(deleteBtn);
 
         shiftContainer.appendChild(buttonGroup);
         dayContainer.appendChild(shiftContainer);
       });
 
-      app.appendChild(dayContainer);
+      appDiv.appendChild(dayContainer);
     });
+
+    async function handleSave(day, shift) {
+      const data = {};
+      const ids = ['operator', 'wireType', 'wireSize', 'wireDiameter', 'requiredQty', 'cutQty', 'machineNum', 'notes'];
+      ids.forEach(id => {
+        data[id] = document.getElementById(`${day}-${shift}-${id}`).value;
+      });
+
+      try {
+        await setDoc(doc(db, "worksheets", `${day}-${shift}`), data);
+        alert("✅ Work sheet saved!");
+      } catch (e) {
+        alert("❌ Error saving: " + e);
+      }
+    }
+
+    async function handleView(day, shift) {
+      try {
+        const ref = doc(db, "worksheets", `${day}-${shift}`);
+        const snapshot = await getDoc(ref);
+        if (snapshot.exists()) {
+          const data = snapshot.data();
+          for (const key in data) {
+            const el = document.getElementById(`${day}-${shift}-${key}`);
+            if (el) el.value = data[key];
+          }
+          alert("📂 Work sheet loaded!");
+        } else {
+          alert("⚠️ No data found.");
+        }
+      } catch (e) {
+        alert("❌ Error loading: " + e);
+      }
+    }
+
+    async function handleDelete(day, shift) {
+      try {
+        await deleteDoc(doc(db, "worksheets", `${day}-${shift}`));
+        const ids = ['operator', 'wireType', 'wireSize', 'wireDiameter', 'requiredQty', 'cutQty', 'machineNum', 'notes'];
+        ids.forEach(id => {
+          const el = document.getElementById(`${day}-${shift}-${id}`);
+          if (el) el.value = '';
+        });
+        alert("🗑️ Work sheet deleted!");
+      } catch (e) {
+        alert("❌ Error deleting: " + e);
+      }
+    }
   </script>
 </body>
 </html>
