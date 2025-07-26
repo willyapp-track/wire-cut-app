@@ -65,6 +65,8 @@
     <label for="password">Password</label>
     <input type="password" id="password" placeholder="Password">
     <button onclick="login()">Login</button>
+    <button onclick="signup()">Sign Up</button>
+    <button onclick="forgotPassword()">Forgot Password?</button>
     <p id="login-error" style="color: red;"></p>
   </div>
 
@@ -72,7 +74,7 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
     import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -209,6 +211,32 @@
         })
         .catch((error) => {
           document.getElementById("login-error").innerText = error.message;
+        });
+    };
+
+    window.signup = function () {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      createUserWithEmailAndPassword(auth, email, password)
+        .then(() => {
+          document.getElementById("login-box").classList.add("hidden");
+          document.getElementById("app").classList.remove("hidden");
+          renderTracker();
+        })
+        .catch((error) => {
+          document.getElementById("login-error").innerText = error.message;
+        });
+    };
+
+    window.forgotPassword = function () {
+      const email = document.getElementById("email").value;
+      if (!email) return alert("Please enter your email to reset password");
+      sendPasswordResetEmail(auth, email)
+        .then(() => {
+          alert("Password reset email sent");
+        })
+        .catch((error) => {
+          alert(error.message);
         });
     };
 
