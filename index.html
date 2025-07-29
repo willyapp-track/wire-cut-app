@@ -75,7 +75,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
     import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
-    import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyArL-sDIt0bQuHIDZIDpODjtV8bziQnEDo",
@@ -164,7 +164,7 @@
               shift,
               timestamp: new Date().toISOString()
             };
-            await setDoc(doc(db, "worksheets", `${day}-${shift}-${user.uid}`), sheet);
+            await addDoc(collection(db, "worksheets"), sheet);
             alert("Saved successfully!");
           };
           container.appendChild(saveBtn);
@@ -174,13 +174,13 @@
           viewBtn.onclick = async () => {
             const user = auth.currentUser;
             if (!user) return alert("Not logged in");
-            const ref = doc(db, "worksheets", `${day}-${shift}-${user.uid}`);
-            const snapshot = await getDoc(ref);
-            if (snapshot.exists()) {
-              const data = snapshot.data();
+            const q = query(collection(db, "worksheets"), where("user", "==", user.email), where("day", "==", day), where("shift", "==", shift));
+            const snapshot = await getDocs(q);
+            if (!snapshot.empty) {
+              const latest = snapshot.docs[snapshot.docs.length - 1].data();
               for (const key in inputs) {
-                if (data[key] !== undefined) {
-                  inputs[key].value = data[key];
+                if (latest[key] !== undefined) {
+                  inputs[key].value = latest[key];
                 }
               }
               alert("History loaded");
